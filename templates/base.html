@@ -1,0 +1,74 @@
+<!-- 
+  Programmer Name: Oey Ching Yi (TP 061246), Student, APU 
+  Program Name: CBCATS application
+  File Name: base.html
+  First Written on: Saturday, 11th February 2023
+  Edited On: 3rd April 2023 
+-->
+
+<!doctype html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.css">
+    <style>
+      body {
+        background-image: url('/static/images/wallpaper.jpeg');
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+      .box {
+        display: inline-block;
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 5px 10px;
+        font-size: small;
+        margin-left: 10px;
+      }
+      .title-box {
+        display: inline-block;
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 10px 10px;
+        font-size: large;
+      }
+      .right-align {
+        float: right;
+      }
+      .back-btn {
+        display: inline-block;
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 5px 10px;
+        font-size: small;
+        margin-right: 10px;
+        background-image: url('/static/images/9247575.png');
+        background-repeat: no-repeat;
+        background-size: 25px 25px;
+        background-position: center;
+        text-decoration: none;
+        color: black;
+        margin-right: 10px;
+        width: 40px;
+        height: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1><a href="javascript:history.back()" class="back-btn"></a><span class="title-box">{{ table_title }}</span><span class="box right-align">User : {{ session['userid'] }}<br>{{ session['username'] }}</span></h1>
+      {% block content %}{% endblock %}
+    </div>
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.js"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+  <footer class="u-align-center u-clearfix u-footer u-grey-80 u-footer" id="sec-be2e"><div class="u-clearfix u-sheet u-sheet-1"></div></footer>
+  <section class="u-backlink u-clearfix u-grey-80">
+    <p class="u-text">
+      <span>Copyright &copy; Oey Ching Yi</span>
+    </p>
+  </section>
+</html>

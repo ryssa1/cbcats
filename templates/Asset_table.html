@@ -1,0 +1,1013 @@
+<!-- 
+  Programmer Name: Oey Ching Yi (TP 061246), Student, APU 
+  Program Name: CBCATS application
+  File Name: Asset_table.html
+  First Written on: Saturday, 11th February 2023
+  Edited On: Monday, 3rd April 2023 
+-->
+
+{% extends "base.html" %}
+{% block content %}
+
+
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+<div class="table-container">
+    <div class="overlay"></div>
+    <table id="data" class="table table-striped">
+        <thead>
+        <tr>
+            <th style="width: 70px;">Options</th>         
+            {% for column in columns %}
+              {% if column not in hide_columns %}
+                {% if column in searchable_columns %}
+                  {% if column in number_fields %}
+                    <th>{{ column_titles[column]}} <input type="number" id="{{ column }}-filter" class="form-control form-control-sm">
+                  {% elif column in date_fields %}
+                    <th>{{ column_titles[column]}} <input type="date" id="{{ column }}-filter" class="form-control form-control-sm">
+                  {% else %}
+                    <th>{{ column_titles[column]}} <input type="text" id="{{ column }}-filter" class="form-control form-control-sm">
+                  {% endif %}
+                  </th>
+                {% else %}
+                  {% if column == 'id' %}
+                    <th style="display:none">{{ column|title }}</th>
+                  {% else %}
+                    <th>{{ column|title }}</th>
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+ 
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<script>
+    const ovtable = document.getElementById("data");
+    const overlay = document.querySelector(".table-container .overlay");
+
+
+    function adjustOverlay() {
+      const tableRect = ovtable.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const overlayWidth = Math.max(viewportWidth, tableRect.right) - tableRect.left;
+      const overlayHeight = Math.max(viewportHeight, tableRect.bottom) - tableRect.top;
+      
+      overlay.style.top = tableRect.top + "px";
+      overlay.style.left = tableRect.left + "px";
+      overlay.style.width = overlayWidth + "px";
+      overlay.style.height = overlayHeight + "px";
+    }
+
+    function handleScroll() {
+      adjustOverlay();
+    }
+
+    window.addEventListener("resize", adjustOverlay);
+    ovtable.addEventListener("scroll", handleScroll);
+
+
+
+</script>
+
+
+<div class="row mt-3">
+  <div class="col">
+      <form id="data-form" class = form-wrapper>
+          {% for column in columns %}
+          {% if column not in hide_columns %}
+          <div class="form-group">
+              <label style="font-weight: bold; display: inline-block;" for="{{ column }}">{{ column|title }}</label>
+              {% if column in session['ERR_MSGS'] %}
+                  <label style="color: red; display: inline-block;" for="{{ column }}" class="form-label">{{ session['ERR_MSGS'][column] }}</label>
+              {% endif %}
+              {% if column == 'supplier_id' %}
+              <div class="input-group bg-readonly">
+                <select class="form-control bg-readonly" id="supplier_id" name="supplier_id" disabled readonly>
+                    <option value="">-- Select Supplier --</option>
+                    {% for supplier in suppliers %}
+                    <option value="{{ supplier.supplier_id }}">{{supplier.supplier_id}}  -  {{supplier.company }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+              {% elif column in date_fields %}
+                  <input type="date" class="form-control bg-readonly" id="{{ column }}" name="{{ column }}" readonly>
+              {% elif column in number_fields %}
+                  <input type="number" class="form-control bg-readonly" min="18" max="100" id="{{ column }}" name="{{ column }}" readonly>
+              {% else %}
+                  <input type="text" class="form-control bg-readonly" id="{{ column }}" name="{{ column }}" readonly>
+              {% endif %}
+          </div>
+          {% else %}
+          <div class="form-group">
+              <label hidden for="{{ column }}">{{ column|title }}</label>
+              <input type="hidden" class="form-control" id="{{ column }}" name="{{ column }}" readonly>
+          </div>
+          {% endif %}
+          {% endfor %}
+          <div class="form-group">
+              <button type="submit" class="btn btn-primary" disabled>Save</button>
+              <button type="cancel" class="btn btn-primary" disabled>Cancel</button>
+          </div>
+      </form>
+  </div>
+</div>
+
+
+
+<!-- <div class="row mt-3">
+  <div class="col">
+      <form id="data-form" class="form-wrapper">
+          {% for column in columns %}
+          {% if column not in hide_columns %}
+          <div class="form-group">
+              <label style="font-weight: bold; display: inline-block;" for="{{ column }}">{{ column|title }}</label>
+              {% if column in session['ERR_MSGS'] %}
+                  <label style="color: red; display: inline-block;" for="{{ column }}" class="form-label">{{ session['ERR_MSGS'][column] }}</label>
+              {% endif %}
+              {% if column == 'asset_id' %}
+                  {% if assets %}
+                  <select class="form-control bg-readonly" id="{{ column }}" name="{{ column }}">
+                      {% for asset in assets %}
+                          <option value="{{ asset.asset_id }}">{{ asset.asset_id }}</option>
+                      {% endfor %}
+                  </select>
+                  {% else %}
+                      <p>No assets available.</p>
+                  {% endif %}
+
+              {% elif column == 'company_ID' %}
+                  {% if companies %}
+                  <select class="form-control bg-readonly" id="{{ column }}" name="{{ column }}">
+                      {% for company in companies %}
+                          <option value="{{ company.company_ID }}">{{ company.company_ID }}</option>
+                      {% endfor %}
+                  </select>
+                  {% else %}
+                      <p>No companies available.</p>
+                  {% endif %}
+
+              {% elif column == 'employee_id' %}
+                  {% if employees %}
+                  <select class="form-control bg-readonly" id="{{ column }}" name="{{ column }}">
+                      {% for employee in employees %}
+                          <option value="{{ employee.employee_id }}">{{ employee.employee_id }}</option>
+                      {% endfor %}
+                  </select>
+                  {% else %}
+                      <p>No employees available.</p>
+                  {% endif %}
+                  
+              {% elif column == 'supplier_id' %}
+                  {% if suppliers %}
+                  <select class="form-control bg-readonly" id="{{ column }}" name="{{ column }}">
+                      {% for supplier in suppliers %}
+                          <option value="{{ supplier.supplier_id }}">{{ supplier.supplier_id }}</option>
+                      {% endfor %}
+                  </select>
+                  {% else %}
+                      <p>No suppliers available.</p>
+                  {% endif %}
+
+              {% elif column in date_fields %}
+                  <input type="date" class="form-control bg-readonly" id="{{ column }}" name="{{ column }}" readonly>
+              {% elif column in number_fields %}
+                  <input type="number" class="form-control bg-readonly" min="18" max="100" id="{{ column }}" name="{{ column }}" readonly>
+              {% else %}
+                  <input type="text" class="form-control bg-readonly" id="{{ column }}" name="{{ column }}" readonly>
+              {% endif %}
+          </div>
+          {% else %}
+          <div class="form-group">
+              <label hidden for="{{ column }}">{{ column|title }}</label>
+              <input type="hidden" class="form-control" id="{{ column }}" name="{{ column }}" readonly>
+          </div>
+          {% endif %}
+          {% endfor %}
+          <div class="form-group">
+              <button type="submit" class="btn btn-primary" disabled>Save</button>
+              <button type="cancel" class="btn btn-primary" disabled>Cancel</button>
+          </div>
+      </form>
+  </div>
+</div> -->
+
+
+<p id="debug-message"></p>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+      var selectedRowIndex = 0;
+      var delay = 500;
+      var rowData = sessionStorage.getItem("rdata"); 
+      var saveMode = sessionStorage.getItem("savemode");
+      var utype = "{{session['usertype']}}";
+      var sortCol = 1; // Default sorting column for HR user
+
+      if ( utype === "ITAM" ) {
+         sortCol = 1;
+      }
+
+      if (!saveMode) {
+        saveMode = "";
+      }
+
+
+
+      function popupDebug(message) {
+        // Set the text of the debug message div
+        // message = JSON.stringify(message);
+        document.getElementById("debug-message").innerHTML = message;
+        $('#debug-message').text(message);
+        // Open the modal dialog
+        $('#debug-modal').modal('show');
+      }
+
+      
+      function log(message) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/log");
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send("message=" + encodeURIComponent(message));
+      }
+
+
+    function sleep(miliseconds) {
+       var currentTime = new Date().getTime();
+
+       while (currentTime + miliseconds >= new Date().getTime()) {
+       }
+    }
+
+
+    function resetErrors() {
+
+        $.ajax({
+          type: "GET",
+          url: "/reset_errors",
+          success: function(response) {
+            console.log(response); // Session variable reset
+              },
+          error: function(jqXHR, textStatus, errorThrown) {
+            console.log("Error: " + errorThrown);
+              }
+          });
+
+          sleep(delay);
+
+      }
+
+
+
+
+
+
+      var table = $('#data').DataTable({
+          ajax: '/api/'+'{{session["TABLE"]}}',
+          columns: [
+              {% if session["usertype"] == "ITAM" %}
+              {
+                  "orderable": false,
+                  "searchable": false,
+                  "sortable": false,
+                  "data": null,
+                  "defaultContent": '<button class="edit_png"><img src="{{url_for('static', filename='images/edit.png')}}" align="middle" width=23 height=auto /></button>' 
+                                               + '<button class="delete_png"><img src="{{ url_for('static', filename='images/delete.png') }}"></button>'
+              },
+              {% else %}
+              {
+                  "orderable": false,
+                  "searchable": false,
+                  "sortable": false,
+                  "data": null,
+                  "defaultContent": '<button class="edit_png"><img src="{{url_for('static', filename='images/edit.png')}}" align="middle" width=23 height=auto /></button>' 
+              },
+
+              {% endif %}
+              {% for column in columns %}
+                  {% if column not in hide_columns %}
+                      {% if column in orderable_columns %}
+                          {% if column in date_fields %}
+                            {
+                                data: '{{ column }}',
+                                render: function(data, type, row, meta) {
+                                    if (type === 'display' && data) {
+                                        var date = new Date(data);
+                                        if (!isNaN(date.getTime())) {
+                                            var day = date.getDate().toString().padStart(2, '0');
+                                            var month = (date.getMonth() + 1).toString().padStart(2, '0');
+                                            var year = date.getFullYear();
+                                            return day + '/' + month + '/' + year;
+                                        }
+                                    }
+                                    return data;
+                                }
+                            },
+                        {% else %}
+                            {data: '{{ column }}', orderable: true, searchable: true},
+                        {% endif %}
+                      {% else %}
+                          {data: '{{ column }}', orderable: false},
+                      {% endif %}
+                  {% endif %}
+              {% endfor %}
+          ],
+          lengthMenu: [[1, 5, 10, 25, 50, -1], [1, 5, 10, 25, 50, "All"]],
+          pageLength: 5,
+          order: [[sortCol, 'asc']], // Set default sorting column to index 1 (second column)
+          scrollX: true
+      });
+
+      // toggleDropdownList(false);
+      // toggleDropdownList2(false);
+      // toggleDropdownList3(false);
+      // toggleDropdownList4(false);
+
+
+      const savedInputs = JSON.parse(sessionStorage.getItem('formData'));
+      const editCancel = JSON.parse(sessionStorage.getItem('editcancel'));
+      const saveSuccess = JSON.parse(sessionStorage.getItem('savesuccess'));
+      var errmsg = "{{session['ERR_MSGS'] }}";
+      // confirm("SAVEDINPUTS"+sessionStorage.getItem('formData')+saveMode);
+      // confirm("SAVBVVVVVV "+JSON.stringify(savedInputs)+"saveMode"+saveMode);
+      $('#data').on('draw.dt', function () {
+        if (editCancel || saveSuccess) {
+            // confirm("CANCEL EDIT/SAVE");
+            restoreFormData('data-form', savedInputs);
+            updateColumnFilterInputs();
+            filter_columns();
+            $('#data tbody tr:eq(0)').click(); // Click the first row
+            $('#data tbody tr:first').addClass('bg-custom');  
+            sessionStorage.setItem('editcancel',false);   
+            sessionStorage.setItem('savesuccess',false);  
+            dropdownDisable1(true);     
+
+
+    
+          } else {
+            // confirm("SaveMODE "+saveMode);  
+            if( errmsg ){
+              restoreFormData('data-form', savedInputs);
+            }
+            if ( saveMode === "" ){
+                // highlight the first row with a custom background color
+                $('#data tbody tr:eq(0)').click(); // Click the first row
+                $('#data tbody tr:first').addClass('bg-custom');         
+
+            }
+        }
+        
+      });      
+
+
+
+      // if (!savedInputs && saveMode ==="" ) {
+      //   // Reload the table
+      //     // wait for the table to finish drawing
+      //     $('#data').one('draw.dt', function () {
+      //       // highlight the first row with a custom background color
+      //         $('#data tbody tr:eq(0)').click(); // Click the first row
+      //         $('#data tbody tr:first').addClass('bg-custom');
+      //     });      
+      // }     
+
+
+
+      // Find the label element
+      const label = document.querySelector('#data_filter > label:nth-child(1)');
+      // Count the number of previous siblings
+      let position = 0;
+      let prevSibling = label.previousSibling;
+      while (prevSibling) {
+        if (prevSibling.nodeType === Node.ELEMENT_NODE) {
+          position++;
+        }
+        prevSibling = prevSibling.previousSibling;
+      }
+
+
+
+      // Create the clear button element
+      const clearBtn = document.createElement('button');
+      clearBtn.textContent = 'Clear';
+      clearBtn.classList.add('btn', 'btn-primary');
+      clearBtn.style.marginRight = '10px';
+
+      // Create the Add button element
+      const addBtn = document.createElement('button');
+      addBtn.textContent = 'Add';
+      addBtn.classList.add('btn', 'btn-primary');
+      addBtn.style.marginRight = '10px';
+
+      // Insert the clear and save buttons before the label element
+      label.parentNode.insertBefore(clearBtn, label);
+      label.parentNode.insertBefore(addBtn, clearBtn);
+
+
+      var btnList = ['Add', 'Edit'];
+
+
+      function hideButtons(btnList) {
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+          if (btnList.includes(button.textContent)) {
+            button.disabled = true;
+            button.style.display = 'none';
+          }
+        });
+      }
+
+
+
+      function showButtons(btnList) {
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+          if (btnList.includes(button.textContent)) {
+            button.disabled = false;
+            button.style.display = '';
+          }
+        });
+      }
+
+      if (utype === "HR" ) {
+        hideButtons(btnList);
+      }
+
+
+
+
+
+
+      // disable sorting when clicking on filter inputs
+      $('#data thead input').on('click', function(e) {
+          e.stopPropagation();
+      });
+
+
+
+      
+      // filter table based on input
+      table.columns().every(function () {
+        var that = this;
+        $('input', this.header()).on('keyup change', function () {
+          // confirm("AFTER KEYUP"+JSON.stringify(this.value) );
+          clearFormInputs();
+          if (that.search() !== this.value) {
+            // that.search(this.value).draw();
+            that.search(this.value, true, false).draw();
+            $('#data tbody tr:eq(0)').click();
+            const rowData = table.row(0).data();
+            // confirm("ROWDATA "+JSON.stringify(rowData));
+            // // Check if any row data is available
+            // if (rowData) {
+            //   // Update the form inputs with the first row data
+            //   updateForm(0);
+            //   // and so on...
+            // } else { 
+            //   clearFormInputs();
+            // }
+          } 
+        });
+      });
+
+
+      var previous = null;
+      $('#data tbody').on('click', 'tr', function () {
+        $('#data tbody tr').removeClass('bg-custom');
+        $(this).addClass('bg-custom');
+        selectedRowIndex = $(this).index;
+        var data = table.row(this).data();
+        previous = this;
+      });
+
+      // check if search or filter is applied and sort table accordingly
+      {% for column in searchable_columns %}
+        var filterInput = $('#{{ column }}-filter');
+        if (filterInput.val()) {
+          table.column('{{ loop.index0 }}').search(filterInput.val());
+          updateForm(0);
+        }
+      {% endfor %}
+
+
+
+    
+<!--    $('#data tbody tr:first-child').addClass('bg-custom');-->
+
+
+    function setSaveMode(mode) {
+      var saveMode = sessionStorage.setItem("savemode",mode);
+    }
+
+
+    function hidePagination() {
+      var col = document.querySelector('.col-md-7');
+      col.style.display = 'none';
+    }
+
+    function showPagination() {
+      var col = document.querySelector('.col-md-7');
+      col.style.display = 'block';
+    }
+
+
+    // Get the search input element
+    // const searchInput = document.querySelector('#data_filter input');
+
+
+    // // Listen for keyup event on search input
+    // searchInput.addEventListener('keyup', function() {
+    //   // Get the first row of the table
+    //   const  = document.querySelector('#data tbody tr:first-child');
+    //   clearFormInputs();
+    //   // Click on the first row of the table
+    //   firstRow.click();
+    // });
+
+
+    function clearFormInputs() {
+      $('#data-form :input').each(function() {
+        $(this).val('');
+      });
+    }
+
+
+
+      function getFormInputs(formId) {
+        const form = document.querySelector('#' + formId);
+        const inputs = form.querySelectorAll('input[type="text"], input[type="number"], input[type="hidden"]');
+        const values = {};
+
+        inputs.forEach(input => {
+          if (input.name) {
+            values[input.name] = input.value;
+          }
+        });
+
+        return values;
+      }
+
+
+      function highlightRow(rowIndex) {
+        // clear previous highlights
+        table.rows().nodes().to$().removeClass('bg-custom');
+        
+        // highlight specified row if table has data
+        if (table.data().count() > 0) {
+          table.row(rowIndex).nodes().to$().addClass('bg-custom');
+        }
+      }
+
+
+
+
+      function updateForm(rowIndex) {
+        const rowData = table.row(rowIndex).data();
+        // Check if any row data is available
+        if (rowData) {
+          // Get all the input fields
+          const inputs = document.querySelectorAll('#data-form input, #data-form select');
+          // Loop through the inputs and update their values
+          inputs.forEach(input => {
+            const columnName = input.name;
+            const columnValue = rowData[columnName];
+            if (columnValue !== undefined) {
+              input.value = columnValue;
+            }
+          });
+        }
+      }
+
+
+
+
+    if (!($('#data-form button[type="submit"]').prop('disabled'))) {
+      $('#data-form :input').attr('readonly', false);
+    }
+
+
+    // Select the clear button
+
+    // Add an event listener to the clear button
+    clearBtn.addEventListener('click', function () {
+      sessionStorage.removeItem('formData');
+      resetBtns();
+    });
+
+
+
+  // get data when row is clicked and populate form
+  const dateFields = {{ date_fields|tojson }};
+
+// get data when row is clicked and populate form
+    $('#data tbody').on('click', 'tr', function () {
+      var data = table.row(this).data();
+      $('#data-form input').each(function () {
+        var name = $(this).attr('name');
+        if (dateFields.includes(name)) {
+          const dateValue = data[name];
+          if (dateValue) {
+            const dateObj = new Date(dateValue);
+            if (!isNaN(dateObj)) {
+              const formattedDate = dateObj.toLocaleDateString('en-GB').split('/').reverse().join('-');
+              $(this).val(formattedDate);
+            } else {
+              $(this).val('');
+            }
+          } else {
+            $(this).val('');
+          }
+        } else {
+          $(this).val(data[name]);
+        }
+      });
+      var dropdown = document.getElementById("supplier_id");
+        dropdown.value = data['supplier_id'];
+      // store the selected row index
+      selectedRowIndex = table.row(this).index();
+    });
+
+    // $('#data tbody').on('click', 'tr', function () {
+    //   var data = table.row(this).data();
+    //   $('#data-form input').each(function () {
+    //     var name = $(this).attr('name');
+    //     $(this).val(data[name]);
+    //     // store the selected row index
+    //   var selectedRowIndex = table.row(this).index();
+    //   });
+    // });
+
+
+
+    // Get the cancel button element
+    const cancelButton = document.querySelector('button[type="cancel"]');
+
+    // Add a click event listener to the cancel button
+    cancelButton.addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent submitting
+      if (saveMode === "EDIT" ) {
+          sessionStorage.setItem('editcancel',true);        
+      }
+      resetBtns();
+    });
+
+
+
+
+
+
+    function resetBtns() {
+      // Loop through all input elements inside the table's header
+      const inputs = document.querySelectorAll('#data thead input');
+      inputs.forEach(input => input.value = '');
+      // Clear search input box
+      $('#data_filter input').val('').keyup();
+      $('#data-form button[type="submit"]').attr('disabled', true);
+      $('#data-form button[type="cancel"]').attr('disabled', true);
+      overlay.style.display = "none";
+      showPagination();
+      if (saveMode) {
+        enableTable();
+      }     
+      saveMode = "";
+      setSaveMode(saveMode);       
+      resetErrors();
+      clearFormInputs();
+      dropdownDisable1(true);
+    
+
+      // const tinputs = JSON.stringify(saveFormData('data-form'));
+      // sessionStorage.setItem('formData', tinputs);      
+      // sleep(delay); 
+      location.reload();
+    }
+
+
+   
+    function dropdownDisable1(rdOnly) {
+        var dropdown = document.getElementById("supplier_id");
+
+        dropdown.disabled = rdOnly;
+        if (rdOnly) {
+            dropdown.classList.remove("bg-white");
+            dropdown.classList.add("bg-readonly");
+            dropdown.setAttribute("readonly", true);
+        } else {
+            dropdown.classList.remove("bg-readonly");
+            dropdown.classList.add("bg-white");
+            dropdown.removeAttribute("readonly");
+        }
+    }
+
+
+    // disable and enable certain elements for editing data
+    function editMode() { 
+      $('#data_filter > button:nth-child(1)').attr('disabled',true);
+      $('#data_filter > button:nth-child(2)').attr('disabled',true);
+      hidePagination();
+      disableTable();
+      if (utype === 'ITAM'){
+        $('#data-form :input').attr('readonly', false);
+      }
+      else {
+        $('#data-form :input').prop('readonly', true); // disable all inputs
+        // $('#data-form').find('input[name="user_type"]').prop('readonly', false); // enable specific inputs
+      }
+      $('#data-form button[type="submit"]').attr('disabled', false);
+      $('#data-form button[type="cancel"]').attr('disabled', false);
+      $('#data :input').prop('disabled', false);
+      // Add the overlay to the document body
+      overlay.style.display = "flex";   
+      dropdownDisable1(false);
+
+
+
+    }
+
+
+
+
+    // popupDebug(sessionStorage.getItem("rdata"));
+    // confirm("SAVE MODE "+saveMode+" "+"{{session['ERR_MSGS'] }}");
+    if (saveMode == "EDIT" || saveMode == "NEW") {
+      var errmsg = "{{session['ERR_MSGS'] }}";
+      if ( errmsg === "{}") {
+          sessionStorage.setItem('savesuccess',true);
+          // confirm("NO ERRORS FOUND");
+          // const tinputs = JSON.stringify(saveFormData('data-form'));
+          // sessionStorage.setItem('formData', tinputs);
+          resetBtns();         
+        } else {
+             // confirm("ERRORS ENCOUNTERED!") 
+             editMode();
+        }
+      } 
+    else 
+      {
+        // confirm("ELSE SAVEMODE");
+        overlay.style.display = "none";
+        // // Restore form inputs after the page is reloaded
+        // const savedInputs = JSON.parse(sessionStorage.getItem('formData'));
+        // if (savedInputs) {
+        //   restoreFormData('data-form', savedInputs);
+        //   sessionStorage.removeItem('formData');
+        //   updateColumnFilterInputs();  
+        //   confirm("RESTORE DATA else EDIT");
+        //   // confirm("UPDATEFILTERS ");
+        //   // location.reload();
+        // } 
+      }
+
+
+
+
+// <!--    $('#data-form button[type="submit"]').attr('disabled', true);-->
+
+    // submit form on save changes button click
+    $('#data-form').submit(function(e) {
+      e.preventDefault();
+      sessionStorage.setItem('savesuccess',false);
+      var fdata = getFormInputs("data-form");
+      // popupDebug(JSON.stringify(fdata));
+      var data = $(this).serializeArray();
+      // confirm(JSON.stringify(data));
+      var url_mode = "";
+      if (saveMode == "EDIT") {
+         url_mode = "/"+"{{session['UPDATE_URL']}}";
+      } 
+      if (saveMode =="NEW") {
+         url_mode = "/"+"{{session['NEW_URL']}}";
+       }
+      const tinputs = JSON.stringify(saveFormData('data-form'));
+      sessionStorage.setItem('formData', tinputs);
+      // confirm("BEFORE  url_mode setting"+url_mode+JSON.stringify(tinputs));
+      $.ajax({
+        type: "POST",
+        url: url_mode,
+        data: data,
+        success: function(response) {
+          console.log(response);
+          // location.reload();
+        },  error: function(jqXHR, textStatus, errorThrown) {
+            console.log("Error: " + errorThrown);
+          }
+      });
+
+      sleep(delay);
+      location.reload();
+    });
+
+
+
+
+
+
+
+    function disableTable() {
+      var ditable = document.getElementById("data");
+
+      // Add an event listener to the table
+      ditable.addEventListener("click", function(event) {
+        // Stop the propagation of the event to its parent elements
+        event.stopPropagation();
+      }, true);
+
+      // Disable all pointer events on table rows
+      var rows = ditable.getElementsByTagName("tr");
+      for (var i = 0; i < rows.length; i++) {
+        rows[i].style.pointerEvents = "none";
+      }
+
+    }
+
+
+    function enableTable() {
+      var entable = document.getElementById("data");
+
+      // Remove the click event listener from the table
+      entable.removeEventListener("click", function(event) {
+        event.stopPropagation();
+      }, true);
+
+      // Enable pointer events on all table rows
+      var rows = entable.getElementsByTagName("tr");
+      for (var i = 0; i < rows.length; i++) {
+        rows[i].style.pointerEvents = "auto";
+      }
+    }
+
+
+
+
+    function updateColumnFilterInputs() {
+      // Get all the column filter input elements
+      const columnFilterInputs = document.querySelectorAll('input[id$="-filter"]');
+      // Loop through the input elements and update the value with the corresponding form input value
+      var totfilters = columnFilterInputs.length - 1; 
+      var cdx = 0;
+      var itmval = "";
+      columnFilterInputs.forEach((input) => {
+        const columnName = input.id.split('-')[0];
+        if (cdx < totfilters) {
+            const formInput = document.getElementById(columnName);
+            if (formInput) {
+              itmval = formInput.value.toString();
+              input.value = itmval;
+            }
+        }
+        cdx = cdx + 1;
+      });
+      // filter_columns();
+    }
+
+
+    function filter_columns() {
+        // confirm("FILTER COLUMNS 1");  
+        // Select all filter inputs
+        var filterInputs = $('#data th input[type="text"]');
+
+        // Trigger the change event on each input
+        filterInputs.each(function() {
+            $(this).trigger('change');
+        });       
+
+    }
+
+
+
+
+     function rowClick(rowIndex) {
+      $(table.row(rowIndex).node()).click();
+    }
+
+
+    // Capture form data
+    function saveFormData(formId) {
+      const form = document.getElementById(formId);
+      const formData = new FormData(form);
+      const data = {};
+
+      for (let pair of formData.entries()) {
+        data[pair[0]] = pair[1];
+      }
+
+      return data;
+    }
+
+    // Restore form data
+    function restoreFormData(formId, data) {
+      const form = document.getElementById(formId);
+
+      for (let key in data) {
+        if (data.hasOwnProperty(key)) {
+          const input = form.querySelector(`[name="${key}"]`);
+          if (input) {
+            input.value = data[key];
+          }
+        }
+      }
+    }
+
+    
+
+    function setFocus() {
+      // Get all the input fields in the form
+      const inputs = document.querySelectorAll('#data-form input');
+
+      // Find the first input field that is not read-only
+      const firstInput = Array.from(inputs).find(input => !input.readOnly);
+
+      // Set focus to the first input field
+      firstInput.focus();
+    }
+
+
+
+
+    // Add event listener for the "Add/NEW" button
+    addBtn.addEventListener('click', function(event) {
+      event.preventDefault();
+      clearFormInputs();
+      saveMode = "NEW"
+      setSaveMode(saveMode);
+      sessionStorage.setItem('editcancel',false); 
+      sessionStorage.setItem('savesuccess',false);
+      resetErrors();      
+      editMode();
+      setFocus();
+      
+    });
+
+
+
+
+    // handle Edit button click
+   $('#data tbody').on('click', '.edit_png', function () {
+      var tr = $(this).closest('tr');
+      var row = table.row(tr);
+      var index = row.index();
+      selectedRowIndex = index;      
+      table.row(index).nodes().to$().addClass('bg-custom');
+      rowClick(index);
+      sleep(delay);
+      const tinputs = JSON.stringify(saveFormData('data-form'));
+      sessionStorage.setItem('formData', tinputs);
+      // confirm("SAVING tinputs "+tinputs);
+      saveMode = "EDIT";
+      setSaveMode(saveMode);
+      sessionStorage.setItem('editcancel',false); 
+      resetErrors();
+      editMode();
+      setFocus();
+    });
+
+
+
+    
+  // handle delete button click
+  $('#data tbody').on('click', 'button.delete_png', function () {
+    var data = table.row($(this).parents('tr')).data();
+    var tr = $(this).closest('tr');
+    var row = table.row(tr);
+    var index = row.index();
+    var nextRow = table.row(index).node();
+    if (confirm('Are you sure you want to delete this record?')) {
+
+      $.ajax({
+        type: 'DELETE',
+        url: '/'+ "{{session['DELETE_URL']}}"+'/' + data['id'],
+        success: function(result) {
+          table.ajax.reload();
+          $('#data-form :input').val('').prop('readonly', true);
+          $('#data-form button[type="submit"]').prop('disabled', true);
+          $('#data tbody tr').removeClass('bg-custom');
+        },
+        error: function(result) {
+          alert('Error deleting data');
+        }
+      });
+      $(nextRow).click();
+      $('#data tbody tr:first-child').addClass('bg-custom');
+    } else {
+        confirm('confirmation error');
+    }
+  });
+
+
+  });
+
+</script>
+{% endblock %}

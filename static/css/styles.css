@@ -1,0 +1,130 @@
+
+/* 
+  Programmer Name: Oey Ching Yi (TP 061246), Student, APU 
+  Program Name: CBCATS application
+  File Name: styles.css
+  First Written on: Saturday, 11th February 2023
+  Edited On: Monday, 3rd April 2023  */
+
+.form-wrapper {
+    border: 2px solid #333;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #d5ebf3;
+}
+
+
+/* Input background color when readonly */
+input.bg-readonly:read-only {
+    background-color: #cacaca;
+}
+
+select.bg-readonly,
+select[disabled].bg-readonly,
+input[type="date"].bg-readonly,
+input[type="number"].bg-readonly,
+input[type="text"].bg-readonly {
+    background-color: #cacaca;
+    color: #495057;
+}
+
+
+/* Input background color when not readonly */
+input.bg-readonly:not(:read-only) {
+    background-color: #ffffff;
+}
+
+
+
+.button-image {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.table-highlight-brown {
+  background-color: #FFE4C4 !important;
+}
+
+.bg-custom {
+  background-color: #D2B48C !important;
+}
+
+tr.active {
+  background-color: #D2B48C !important;
+}
+
+.selected {
+  background-color: #F5DEB3 !important;
+}
+
+.form-control[readonly] {
+  border: none;
+  background-color: #f8f9fa;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+
+    margin: 0;
+    padding: 0;
+}
+
+.table-container {
+    position: relative;
+    width: 100%;
+    margin: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: flex;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid black;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.data {
+   z-index:1000;
+}
+
+.content {
+  position: relative;
+  z-index: 1; /* make sure the content is on top of the overlay */
+}
+
+
+.clear-btn {
+    margin-right: 20px;
+}
+
+.error-message {
+    font-weight: bold;
+    color: red;
+}
+
+.u-text-1 {
+    margin-bottom: 10px;
+}
